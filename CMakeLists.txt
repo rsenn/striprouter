@@ -151,6 +151,9 @@ set(SOURCE_FILES
   ${SOURCE_DIR}/via.cpp
   ${SOURCE_DIR}/write_svg.cpp
 )
+if(NOT EIGEN3_INCLUDE_DIR)
+  SET(EIGEN3_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/eigen3)
+endif(NOT EIGEN3_INCLUDE_DIR) 
 
 include_directories(
   ${HEADER_LIBRARIES}
@@ -165,6 +168,9 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
   ${PNG_INCLUDE_DIRS}
   ${SIMPLE_SVG_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}/libraries/linux/nanovg/src
+  ${CMAKE_SOURCE_DIR}/libraries/header_only/simple-svg
+  ${CMAKE_SOURCE_DIR}/libraries/header_only/CmdParser
 )
 
 link_directories(
@@ -187,7 +193,7 @@ link_libraries(
   ${X_LIBRARIES}
 )
 
-add_definitions(${PNG_DEFINITIONS})
+add_definitions(${PNG_DEFINITIONS} -DGLM_ENABLE_EXPERIMENTAL=1)
 
 # Suppress GLM warning about having switched from degrees to radians as default
 add_definitions(-DGLM_FORCE_RADIANS)

@@ -6,33 +6,27 @@
 #include "router.h"
 #include "ucs.h"
 
-Router::Router(
-    Layout& _layout, ConnectionIdxVec& connectionIdxVec, ThreadStop& threadStop,
-    Layout& _inputLayout, Layout& _currentLayout,
-    const TimeDuration& _maxRenderDelay)
-  : layout_(_layout),
-    connectionIdxVec_(connectionIdxVec),
-    inputLayout_(_inputLayout),
-    currentLayout_(_currentLayout),
-    nets_(_layout),
-    threadStop_(threadStop),
-    allPinSet_(ViaSet()),
-    maxRenderDelay_(_maxRenderDelay)
-{
+Router::Router(Layout& _layout,
+               ConnectionIdxVec& connectionIdxVec,
+               ThreadStop& threadStop,
+               Layout& _inputLayout,
+               Layout& _currentLayout,
+               const TimeDuration& _maxRenderDelay)
+    : layout_(_layout), connectionIdxVec_(connectionIdxVec), inputLayout_(_inputLayout), currentLayout_(_currentLayout),
+      nets_(_layout), threadStop_(threadStop), allPinSet_(ViaSet()), maxRenderDelay_(_maxRenderDelay) {
   viaTraceVec_ = WireLayerViaVec(layout_.gridW * layout_.gridH);
 }
 
-bool Router::route()
-{
+bool
+Router::route() {
   blockComponentFootprints();
   joinAllConnections();
   registerActiveComponentPins();
   auto isAborted = routeAll();
   layout_.stripCutVec = findStripCuts();
-  layout_.cost +=
-      layout_.settings.cut_cost * static_cast<int>(layout_.stripCutVec.size());
+  layout_.cost += layout_.settings.cut_cost * static_cast<int>(layout_.stripCutVec.size());
   layout_.isReadyForEval = true;
-  if (layout_.hasError) {
+  if(layout_.hasError) {
     layout_.diagTraceVec = viaTraceVec_;
   }
   return isAborted;
@@ -42,13 +36,13 @@ bool Router::route()
 // Private
 //
 
-bool Router::routeAll()
-{
+bool
+Router::routeAll() {
   bool isAborted = false;
   auto startTime = std::chrono::steady_clock::now();
   auto connectionViaVec = layout_.circuit.genConnectionViaVec();
   layout_.routeStatusVec.resize(connectionViaVec.size(), false);
-  for (auto connectionIdx : connectionIdxVec_) {
+  for(auto connectionIdx : connectionIdxVec_) {
     auto viaStartEnd = connectionViaVec[connectionIdx];
     auto routeWasFound = findCompleteRoute(viaStartEnd);
     layout_.routeStatusVec[connectionIdx] = routeWasFound;
@@ -63,21 +57,21 @@ bool Router::routeAll()
 //    }
 #endif
 
-    if (threadStop_.isStopped()) {
+    if(threadStop_.isStopped()) {
       isAborted = true;
       break;
     }
     {
       auto lock = inputLayout_.scopeLock();
-      if (!layout_.isBasedOn(inputLayout_)) {
+      if(!layout_.isBasedOn(inputLayout_)) {
         isAborted = true;
         break;
       }
     }
-    if (layout_.hasError) {
+    if(layout_.hasError) {
       break;
     }
-    if (std::chrono::steady_clock::now() - startTime > maxRenderDelay_) {
+    if(std::chrono::steady_clock::now() - startTime > maxRenderDelay_) {
       auto lock = currentLayout_.scopeLock();
       currentLayout_ = layout_;
       startTime = std::chrono::steady_clock::now();
@@ -101,24 +95,23 @@ bool Router::routeAll()
 // I've currently implemented (2). I'm not sure if (1) would create any
 // different routes.
 
-bool Router::findCompleteRoute(const StartEndVia& viaStartEnd)
-{
+bool
+Router::findCompleteRoute(const StartEndVia& viaStartEnd) {
   Via shortcutEndVia;
   auto routeWasFound = findRoute(shortcutEndVia, viaStartEnd);
-  if (routeWasFound) {
+  if(routeWasFound) {
     ++layout_.nCompletedRoutes;
-  }
-  else {
+  } else {
     ++layout_.nFailedRoutes;
   }
   return routeWasFound;
 }
 
-bool Router::findRoute(Via& shortcutEndVia, const StartEndVia& viaStartEnd)
-{
+bool
+Router::findRoute(Via& shortcutEndVia, const StartEndVia& viaStartEnd) {
   UniformCostSearch ucs(*this, layout_, nets_, shortcutEndVia, viaStartEnd);
   auto routeStepVec = ucs.findLowestCostRoute();
-  if (layout_.hasError || !routeStepVec.size()) {
+  if(layout_.hasError || !routeStepVec.size()) {
     return false;
   }
   blockRoute(routeStepVec);
@@ -133,23 +126,22 @@ bool Router::findRoute(Via& shortcutEndVia, const StartEndVia& viaStartEnd)
 // - Through to wire always starts a wire section.
 // - Through to strip always ends a wire section.
 // - Everything else is a strip section.
-RouteSectionVec Router::condenseRoute(const RouteStepVec& routeStepVec)
-{
+RouteSectionVec
+Router::condenseRoute(const RouteStepVec& routeStepVec) {
   RouteSectionVec routeSectionVec;
   assert(!routeStepVec.begin()->isWireLayer);
   assert(!(routeStepVec.rend() - 1)->isWireLayer);
   auto startSection = routeStepVec.begin();
-  for (auto i = routeStepVec.begin() + 1; i != routeStepVec.end(); ++i) {
-    if (i->isWireLayer != (i - 1)->isWireLayer) {
-      if ((i - 1) != startSection) {
+  for(auto i = routeStepVec.begin() + 1; i != routeStepVec.end(); ++i) {
+    if(i->isWireLayer != (i - 1)->isWireLayer) {
+      if((i - 1) != startSection) {
         routeSectionVec.push_back(LayerStartEndVia(*startSection, *(i - 1)));
         startSection = i;
       }
     }
   }
-  if (startSection != routeStepVec.end() - 1) {
-    routeSectionVec.push_back(
-        LayerStartEndVia(*startSection, *(routeStepVec.end() - 1)));
+  if(startSection != routeStepVec.end() - 1) {
+    routeSectionVec.push_back(LayerStartEndVia(*startSection, *(routeStepVec.end() - 1)));
   }
   return routeSectionVec;
 }
@@ -162,19 +154,19 @@ RouteSectionVec Router::condenseRoute(const RouteStepVec& routeStepVec)
 // - unused <-> used
 // - unused <-> pin
 // - used <-> same pin
-StripCutVec Router::findStripCuts()
-{
+StripCutVec
+Router::findStripCuts() {
   StripCutVec v;
-  for (int x = 0; x < layout_.gridW; ++x) {
+  for(int x = 0; x < layout_.gridW; ++x) {
     bool isUsed = false;
-    for (int y = 1; y < layout_.gridH; ++y) {
+    for(int y = 1; y < layout_.gridH; ++y) {
       Via prevVia(x, y - 1);
       Via curVia(x, y);
       auto isConnected = nets_.isConnected(curVia, prevVia);
       bool isInOtherNet = nets_.hasConnection(curVia) && !isConnected;
       bool isOtherPin = isAnyPin(curVia) && !isConnected;
-      if (isInOtherNet || isOtherPin) {
-        if (isUsed) {
+      if(isInOtherNet || isOtherPin) {
+        if(isUsed) {
           v.push_back(curVia);
         }
         isUsed = true;
@@ -188,26 +180,23 @@ StripCutVec Router::findStripCuts()
 // Interface for Uniform Cost Search
 //
 
-bool Router::isAvailable(
-    const LayerVia& via, const Via& startVia, const Via& targetVia)
-{
-  if (via.via.x() < 0 || via.via.y() < 0 || via.via.x() >= layout_.gridW
-      || via.via.y() >= layout_.gridH) {
+bool
+Router::isAvailable(const LayerVia& via, const Via& startVia, const Via& targetVia) {
+  if(via.via.x() < 0 || via.via.y() < 0 || via.via.x() >= layout_.gridW || via.via.y() >= layout_.gridH) {
     return false;
   }
-  if (via.isWireLayer) {
-    if (isBlocked(via.via)) {
+  if(via.isWireLayer) {
+    if(isBlocked(via.via)) {
       return false;
     }
-  }
-  else {
+  } else {
     // If it has an equivalent, it must be our equivalent
-    if (nets_.hasConnection(via.via) && !nets_.isConnected(via.via, startVia)) {
+    if(nets_.hasConnection(via.via) && !nets_.isConnected(via.via, startVia)) {
       return false;
     }
     // Can go to component pin only if it's our equivalent.
-    if (isAnyPin(via.via)) {
-      if (!nets_.isConnected(via.via, startVia)) {
+    if(isAnyPin(via.via)) {
+      if(!nets_.isConnected(via.via, startVia)) {
         return false;
       }
     }
@@ -216,29 +205,28 @@ bool Router::isAvailable(
   return true;
 }
 
-bool Router::isTarget(const LayerVia& via, const Via& targetVia)
-{
-  if (via.isWireLayer) {
+bool
+Router::isTarget(const LayerVia& via, const Via& targetVia) {
+  if(via.isWireLayer) {
     return false;
-  }
-  else if (isTargetPin(via, targetVia)) {
+  } else if(isTargetPin(via, targetVia)) {
     return true;
   }
   return false;
 }
 
-bool Router::isTargetPin(const LayerVia& via, const Via& targetVia)
-{
+bool
+Router::isTargetPin(const LayerVia& via, const Via& targetVia) {
   return (via.via == targetVia).all();
 }
 
-bool Router::isAnyPin(const Via& via)
-{
+bool
+Router::isAnyPin(const Via& via) {
   return allPinSet_.count(via) > 0;
 }
 
-ValidVia& Router::wireToViaRef(const Via& via)
-{
+ValidVia&
+Router::wireToViaRef(const Via& via) {
   return viaTraceVec_[layout_.idx(via)].wireToVia;
 }
 
@@ -246,36 +234,36 @@ ValidVia& Router::wireToViaRef(const Via& via)
 // Wire layer blocking
 //
 
-void Router::blockComponentFootprints()
-{
+void
+Router::blockComponentFootprints() {
   // Block the entire component footprint on the wire layer
-  for (auto& ci : layout_.circuit.componentNameToComponentMap) {
+  for(auto& ci : layout_.circuit.componentNameToComponentMap) {
     const auto& componentName = ci.first;
     auto footprint = layout_.circuit.calcComponentFootprint(componentName);
-    for (int y = footprint.start.y(); y <= footprint.end.y(); ++y) {
-      for (int x = footprint.start.x(); x <= footprint.end.x(); ++x) {
+    for(int y = footprint.start.y(); y <= footprint.end.y(); ++y) {
+      for(int x = footprint.start.x(); x <= footprint.end.x(); ++x) {
         block(Via(x, y));
       }
     }
   }
 }
 
-void Router::blockRoute(const RouteStepVec& routeStepVec)
-{
-  for (auto& c : routeStepVec) {
-    if (c.isWireLayer) {
+void
+Router::blockRoute(const RouteStepVec& routeStepVec) {
+  for(auto& c : routeStepVec) {
+    if(c.isWireLayer) {
       block(c.via);
     }
   }
 }
 
-void Router::block(const Via& via)
-{
+void
+Router::block(const Via& via) {
   viaTraceVec_[layout_.idx(via)].isWireSideBlocked = true;
 }
 
-bool Router::isBlocked(const Via& via)
-{
+bool
+Router::isBlocked(const Via& via) {
   return viaTraceVec_[layout_.idx(via)].isWireSideBlocked;
 }
 
@@ -283,22 +271,22 @@ bool Router::isBlocked(const Via& via)
 // Nets
 //
 
-void Router::joinAllConnections()
-{
-  for (auto& c : layout_.circuit.genConnectionViaVec()) {
+void
+Router::joinAllConnections() {
+  for(auto& c : layout_.circuit.genConnectionViaVec()) {
     nets_.connect(c.start, c.end);
   }
 }
 
-void Router::registerActiveComponentPins()
-{
-  for (auto& ci : layout_.circuit.componentNameToComponentMap) {
+void
+Router::registerActiveComponentPins() {
+  for(auto& ci : layout_.circuit.componentNameToComponentMap) {
     const auto& componentName = ci.first;
     const auto& component = ci.second;
     auto pinViaVec = layout_.circuit.calcComponentPins(componentName);
     auto pinIdx = 0;
-    for (auto via : pinViaVec) {
-      if (!component.dontCarePinIdxSet.count(pinIdx)) {
+    for(auto via : pinViaVec) {
+      if(!component.dontCarePinIdxSet.count(pinIdx)) {
         allPinSet_.insert(via);
       }
       ++pinIdx;
@@ -306,13 +294,13 @@ void Router::registerActiveComponentPins()
   }
 }
 
-void Router::addWireJumps(const RouteSectionVec& routeSectionVec)
-{
-  for (auto section : routeSectionVec) {
+void
+Router::addWireJumps(const RouteSectionVec& routeSectionVec) {
+  for(auto section : routeSectionVec) {
     const auto& start = section.start;
     const auto& end = section.end;
     assert(start.isWireLayer == end.isWireLayer);
-    if (start.isWireLayer) {
+    if(start.isWireLayer) {
       wireToViaRef(start.via) = ValidVia(end.via, true);
       wireToViaRef(end.via) = ValidVia(start.via, true);
     }

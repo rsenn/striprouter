@@ -19,28 +19,24 @@ typedef Eigen::Array2i Via;
 
 std::string str(const Via& v);
 
-namespace std
-{
-template <>
-struct hash<Via>
-{
-  std::size_t operator()(const Via& l) const
-  {
+namespace std {
+template <> struct hash<Via> {
+  std::size_t
+  operator()(const Via& l) const {
     return l.x() ^ l.y();
   }
 };
 
 bool operator<(const Via& l, const Via& r);
 bool operator==(const Via& l, const Via& r);
-}
+} // namespace std
 
 //
 // ValidVia
 //
 
-class ValidVia
-{
-  public:
+class ValidVia {
+public:
   ValidVia();
   ValidVia(const Via&);
   ValidVia(const Via&, bool isValid);
@@ -54,9 +50,8 @@ class ValidVia
 
 class LayerCostVia;
 
-class LayerVia
-{
-  public:
+class LayerVia {
+public:
   LayerVia();
   LayerVia(const LayerVia&);
   LayerVia(const Via&, bool _isWireLayer);
@@ -66,28 +61,24 @@ class LayerVia
   bool isWireLayer;
 };
 
-namespace std
-{
-template <>
-struct hash<LayerVia>
-{
-  std::size_t operator()(const LayerVia& l) const
-  {
+namespace std {
+template <> struct hash<LayerVia> {
+  std::size_t
+  operator()(const LayerVia& l) const {
     return l.via.x() ^ l.via.y() ^ (l.isWireLayer ? 1 : 0);
   }
 };
 
 bool operator<(const LayerVia& l, const LayerVia& r);
 bool operator==(const LayerVia& l, const LayerVia& r);
-}
+} // namespace std
 
 //
 // LayerCostVia
 //
 
-class LayerCostVia : public LayerVia
-{
-  public:
+class LayerCostVia : public LayerVia {
+public:
   LayerCostVia();
   LayerCostVia(const LayerVia& viaLayerIn, int costIn);
   LayerCostVia(int xIn, int yIn, bool isWireLayerIn, int costIn);
@@ -95,19 +86,17 @@ class LayerCostVia : public LayerVia
   int cost;
 };
 
-namespace std
-{
+namespace std {
 bool operator<(const LayerCostVia& l, const LayerCostVia& r);
 bool operator==(const LayerCostVia& l, const LayerCostVia& r);
-}
+} // namespace std
 
 //
 // StartEndVia
 //
 
-class StartEndVia
-{
-  public:
+class StartEndVia {
+public:
   StartEndVia();
   StartEndVia(const Via& _start, const Via& _end);
   Via start;
@@ -118,9 +107,8 @@ class StartEndVia
 // LayerStartEndVia
 //
 
-class LayerStartEndVia
-{
-  public:
+class LayerStartEndVia {
+public:
   LayerStartEndVia();
   LayerStartEndVia(const LayerVia& startIn, const LayerVia& endIn);
   LayerVia start;
@@ -131,9 +119,8 @@ class LayerStartEndVia
 // WireLayerVia
 //
 
-class WireLayerVia
-{
-  public:
+class WireLayerVia {
+public:
   WireLayerVia();
   bool isWireSideBlocked;
   ValidVia wireToVia;
@@ -145,9 +132,8 @@ typedef std::vector<WireLayerVia> WireLayerViaVec;
 // CostVia
 //
 
-class CostVia
-{
-  public:
+class CostVia {
+public:
   CostVia();
   int wireCost;
   int stripCost;

@@ -25,9 +25,8 @@ typedef std::vector<int> SetIdxVec;
 
 typedef std::chrono::time_point<std::chrono::high_resolution_clock> Timestamp;
 
-class Layout
-{
-  public:
+class Layout {
+public:
   Layout();
   Layout(const Layout&);
   Layout& operator=(const Layout&);
@@ -74,7 +73,7 @@ class Layout
   WireLayerViaVec diagTraceVec;
   StringVec errorStringVec;
 
-  private:
+private:
   void copy(const Layout& s);
   std::mutex mutex_;
   Timestamp timestamp_;

@@ -4,9 +4,8 @@
 
 extern std::mutex statusMutex;
 
-class Status
-{
-  public:
+class Status {
+public:
   Status();
   int nCombinationsChecked;
 };

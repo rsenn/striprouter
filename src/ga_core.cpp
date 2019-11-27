@@ -11,37 +11,27 @@
 
 #include "ga_core.h"
 
-GeneDependency::GeneDependency(Gene gene, Gene geneDependency)
-  : gene(gene), geneDependency(geneDependency)
-{
-}
+GeneDependency::GeneDependency(Gene gene, Gene geneDependency) : gene(gene), geneDependency(geneDependency) {}
 
 //
 // Random
 //
 
 RandomIntGenerator::RandomIntGenerator()
-  : randomEngine_(
-        static_cast<unsigned long>(
-            std::chrono::system_clock::now().time_since_epoch().count()))
-{
-}
+    : randomEngine_(static_cast<unsigned long>(std::chrono::system_clock::now().time_since_epoch().count())) {}
 
 RandomIntGenerator::RandomIntGenerator(int min, int max)
-  : randomEngine_(
-        static_cast<unsigned long>(
-            std::chrono::system_clock::now().time_since_epoch().count()))
-{
+    : randomEngine_(static_cast<unsigned long>(std::chrono::system_clock::now().time_since_epoch().count())) {
   setRange(min, max);
 }
 
-void RandomIntGenerator::setRange(int min, int max)
-{
+void
+RandomIntGenerator::setRange(int min, int max) {
   uniformIntDistribution_ = std::uniform_int_distribution<>(min, max);
 }
 
-GeneIdx RandomIntGenerator::getRandomInt()
-{
+GeneIdx
+RandomIntGenerator::getRandomInt() {
   return uniformIntDistribution_(randomEngine_);
 }
 
@@ -50,45 +40,39 @@ GeneIdx RandomIntGenerator::getRandomInt()
 //
 
 Organism::Organism(int nGenes, RandomIntGenerator& randomGeneSelector)
-  : nCompletedRoutes(0),
-    completedRouteCost(0),
-    nGenes_(nGenes),
-    randomGeneSelector_(randomGeneSelector)
-{
-}
+    : nCompletedRoutes(0), completedRouteCost(0), nGenes_(nGenes), randomGeneSelector_(randomGeneSelector) {}
 
-void Organism::createRandom()
-{
-  for (int i = 0; i < nGenes_; ++i) {
+void
+Organism::createRandom() {
+  for(int i = 0; i < nGenes_; ++i) {
     geneVec.push_back(randomGeneSelector_.getRandomInt());
   }
 }
 
-GeneIdx Organism::getRandomCrossoverPoint()
-{
+GeneIdx
+Organism::getRandomCrossoverPoint() {
   return randomGeneSelector_.getRandomInt();
 }
 
-void Organism::mutate()
-{
+void
+Organism::mutate() {
   auto dependentIdx = randomGeneSelector_.getRandomInt();
   auto dependencyIdx = randomGeneSelector_.getRandomInt();
   geneVec[dependentIdx] = dependencyIdx;
 }
 
-GeneVec Organism::calcConnectionIdxVec()
-{
+GeneVec
+Organism::calcConnectionIdxVec() {
   auto geneVec = topoSort();
   assert(static_cast<int>(geneVec.size()) == nGenes_);
   return geneVec;
 }
 
-void Organism::dump()
-{
+void
+Organism::dump() {
   fmt::print(
-      "nCompletedRoutes={} completedRouteCost={} nGenes={} genes=",
-      nCompletedRoutes, completedRouteCost, nGenes_);
-  for (auto& v : geneVec) {
+      "nCompletedRoutes={} completedRouteCost={} nGenes={} genes=", nCompletedRoutes, completedRouteCost, nGenes_);
+  for(auto& v : geneVec) {
     fmt::print(" {}", v);
   }
   fmt::print("\n");
@@ -98,38 +82,36 @@ void Organism::dump()
 // Private
 //
 
-GeneVec Organism::topoSort()
-{
+GeneVec
+Organism::topoSort() {
   std::list<GeneDependency> geneList;
   int i = 0;
   //  fmt::print("{}\n", geneVec.size());
-  for (auto geneIdx : geneVec) {
+  for(auto geneIdx : geneVec) {
     geneList.push_back(GeneDependency(i, geneIdx));
     ++i;
   }
 
-  geneList.sort([](const GeneDependency& a, const GeneDependency& b) -> bool {
-    return a.geneDependency < b.geneDependency;
-  });
+  geneList.sort(
+      [](const GeneDependency& a, const GeneDependency& b) -> bool { return a.geneDependency < b.geneDependency; });
 
   GeneVec geneVec;
   std::unordered_set<int> dependencySet;
 
-  while (geneList.size()) {
+  while(geneList.size()) {
     bool found = false;
     auto itr = geneList.begin();
-    while (itr != geneList.end()) {
-      if (dependencySet.count(itr->geneDependency)) {
+    while(itr != geneList.end()) {
+      if(dependencySet.count(itr->geneDependency)) {
         geneVec.push_back(itr->gene);
         dependencySet.insert(itr->gene);
         itr = geneList.erase(itr);
         found = true;
-      }
-      else {
+      } else {
         ++itr;
       }
     }
-    if (!found) {
+    if(!found) {
       geneVec.push_back(geneList.front().gene);
       dependencySet.insert(geneList.front().gene);
       geneList.pop_front();
@@ -142,41 +124,35 @@ GeneVec Organism::topoSort()
 // Population
 //
 
-OrganismPair::OrganismPair(Organism& a, Organism& b) : a(a), b(b)
-{
-}
+OrganismPair::OrganismPair(Organism& a, Organism& b) : a(a), b(b) {}
 
-Population::Population(
-    int nOrganismsInPopulation, double crossoverRate, double mutationRate)
-  : nOrganismsInPopulation_(nOrganismsInPopulation),
-    crossoverRate_(crossoverRate),
-    mutationRate_(mutationRate),
-    randomOrganismSelector_(0, nOrganismsInPopulation - 1)
-{
+Population::Population(int nOrganismsInPopulation, double crossoverRate, double mutationRate)
+    : nOrganismsInPopulation_(nOrganismsInPopulation), crossoverRate_(crossoverRate), mutationRate_(mutationRate),
+      randomOrganismSelector_(0, nOrganismsInPopulation - 1) {
   assert(!(nOrganismsInPopulation & 1)); // Must have even number of organisms
 }
 
-void Population::reset(int nGenesPerOrganism)
-{
+void
+Population::reset(int nGenesPerOrganism) {
   nGenesPerOrganism_ = nGenesPerOrganism;
   randomGeneSelector_.setRange(0, nGenesPerOrganism - 1);
   createRandomPopulation();
 }
 
-void Population::nextGeneration()
-{
+void
+Population::nextGeneration() {
   OrganismVec newGenerationVec;
   auto nMutations = 0;
-  for (int i = 0; i < nOrganismsInPopulation_ / 2; ++i) {
+  for(int i = 0; i < nOrganismsInPopulation_ / 2; ++i) {
     auto pair = selectPairTournament(2);
-    if (getNormalizedRandom() < crossoverRate_) {
+    if(getNormalizedRandom() < crossoverRate_) {
       crossover(pair);
     }
-    if (getNormalizedRandom() < mutationRate_) {
+    if(getNormalizedRandom() < mutationRate_) {
       pair.a.mutate();
       ++nMutations;
     }
-    if (getNormalizedRandom() < mutationRate_) {
+    if(getNormalizedRandom() < mutationRate_) {
       pair.b.mutate();
       ++nMutations;
     }
@@ -191,48 +167,47 @@ void Population::nextGeneration()
 // Private
 //
 
-void Population::createRandomPopulation()
-{
+void
+Population::createRandomPopulation() {
   organismVec.clear();
-  for (int i = 0; i < nOrganismsInPopulation_; ++i) {
+  for(int i = 0; i < nOrganismsInPopulation_; ++i) {
     Organism organism(nGenesPerOrganism_, randomGeneSelector_);
     organism.createRandom();
     organismVec.push_back(organism);
   }
 }
 
-void Population::crossover(OrganismPair& pair)
-{
+void
+Population::crossover(OrganismPair& pair) {
   auto crossIdx = pair.a.getRandomCrossoverPoint();
-  for (int i = crossIdx; i < static_cast<int>(pair.a.geneVec.size()); ++i) {
+  for(int i = crossIdx; i < static_cast<int>(pair.a.geneVec.size()); ++i) {
     std::swap(pair.a.geneVec[i], pair.b.geneVec[i]);
   }
 }
 
-OrganismPair Population::selectPairTournament(int nCandidates)
-{
+OrganismPair
+Population::selectPairTournament(int nCandidates) {
   auto organismAIdx = tournamentSelect(nCandidates);
-  while (true) {
+  while(true) {
     auto organismBIdx = tournamentSelect(nCandidates);
-    if (organismAIdx != organismBIdx) {
+    if(organismAIdx != organismBIdx) {
       return OrganismPair(organismVec[organismAIdx], organismVec[organismBIdx]);
     }
   }
 }
 
-OrganismIdx Population::tournamentSelect(int nCandidates)
-{
+OrganismIdx
+Population::tournamentSelect(int nCandidates) {
   OrganismIdx bestOrganismIdx = -1;
   int lowestCompletedRouteCost = INT_MAX;
   int nHighestCompletedRoutes = 0;
 
-  for (int i = 0; i < nCandidates; ++i) {
+  for(int i = 0; i < nCandidates; ++i) {
     OrganismIdx organismIdx = randomOrganismSelector_.getRandomInt();
 
     auto& organism = organismVec[organismIdx];
 
-    auto hasMoreCompletedRoutes =
-        organism.nCompletedRoutes > nHighestCompletedRoutes;
+    auto hasMoreCompletedRoutes = organism.nCompletedRoutes > nHighestCompletedRoutes;
 
     //    auto hasEqualCompletedRoutes =
     //      organism.nCompletedRoutes == nHighestCompletedRoutes;
@@ -243,13 +218,12 @@ OrganismIdx Population::tournamentSelect(int nCandidates)
     //    auto isRandomPick = getNormalizedRandom() > 0.5;
 
     auto hasEqualRoutesAndLowerCost =
-        organism.nCompletedRoutes == nHighestCompletedRoutes
-        && organism.completedRouteCost < lowestCompletedRouteCost;
+        organism.nCompletedRoutes == nHighestCompletedRoutes && organism.completedRouteCost < lowestCompletedRouteCost;
 
     //    if (hasMoreCompletedRoutes || (hasEqualCompletedRoutes &&
     //    isRandomPick)) {
 
-    if (hasMoreCompletedRoutes | hasEqualRoutesAndLowerCost) {
+    if(hasMoreCompletedRoutes | hasEqualRoutesAndLowerCost) {
       bestOrganismIdx = organismIdx;
       lowestCompletedRouteCost = organism.completedRouteCost;
       nHighestCompletedRoutes = organism.nCompletedRoutes;
@@ -258,8 +232,8 @@ OrganismIdx Population::tournamentSelect(int nCandidates)
   return bestOrganismIdx;
 }
 
-double Population::getNormalizedRandom()
-{
+double
+Population::getNormalizedRandom() {
   static std::default_random_engine e;
   static std::uniform_real_distribution<> d(0.0, 1.0);
   return d(e);

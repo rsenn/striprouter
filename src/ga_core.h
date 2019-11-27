@@ -11,15 +11,14 @@
 
 typedef int GeneIdx;
 
-class RandomIntGenerator
-{
-  public:
+class RandomIntGenerator {
+public:
   RandomIntGenerator();
   RandomIntGenerator(int min, int max);
   void setRange(int min, int max);
   int getRandomInt();
 
-  private:
+private:
   std::default_random_engine randomEngine_;
   std::uniform_int_distribution<> uniformIntDistribution_;
 };
@@ -31,9 +30,8 @@ class RandomIntGenerator
 typedef int Gene;
 typedef std::vector<Gene> GeneVec;
 
-class GeneDependency
-{
-  public:
+class GeneDependency {
+public:
   GeneDependency(Gene gene, Gene geneDependency);
 
   Gene gene;
@@ -44,9 +42,8 @@ class GeneDependency
 // Organism
 //
 
-class Organism
-{
-  public:
+class Organism {
+public:
   Organism(int nGenes, RandomIntGenerator& randomGeneSelector);
   void createRandom();
   GeneIdx getRandomCrossoverPoint();
@@ -59,7 +56,7 @@ class Organism
 
   GeneVec geneVec;
 
-  private:
+private:
   GeneVec topoSort();
 
   int nGenes_;
@@ -70,9 +67,8 @@ class Organism
 // Population
 //
 
-class OrganismPair
-{
-  public:
+class OrganismPair {
+public:
   OrganismPair(Organism& a, Organism& b);
   Organism& a;
   Organism& b;
@@ -82,17 +78,15 @@ typedef int OrganismIdx;
 
 typedef std::vector<Organism> OrganismVec;
 
-class Population
-{
-  public:
-  Population(
-      int nOrganismsInPopulation, double crossoverRate, double mutationRate);
+class Population {
+public:
+  Population(int nOrganismsInPopulation, double crossoverRate, double mutationRate);
   void reset(int nGenesPerOrganism);
   void nextGeneration();
 
   OrganismVec organismVec;
 
-  private:
+private:
   void createRandomPopulation();
   void crossover(OrganismPair& pair);
   OrganismPair selectPairTournament(int nCandidates);

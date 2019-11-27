@@ -7,14 +7,13 @@
 
 #include "layout.h"
 
-class CircuitFileParser
-{
-  public:
+class CircuitFileParser {
+public:
   CircuitFileParser(Layout&);
   ~CircuitFileParser();
   void parse(std::string& circuitFilePath);
 
-  private:
+private:
   void parseLine(std::string lineStr);
   bool parseCommentOrEmpty(std::string& lineStr);
   bool parseBoard(std::string& lineStr);

@@ -15,9 +15,8 @@
 // to a single pin. Without the nets, the first route connected to a pin would
 // block the pin off for other routes.
 
-class Nets
-{
-  public:
+class Nets {
+public:
   Nets(Layout&);
   void connect(const Via& viaA, const Via& viaB);
   void connectRoute(const RouteStepVec& routeStepVec);
@@ -27,7 +26,7 @@ class Nets
   ViaSet& getViaSet(const Via& via);
   int getViaSetIdx(const Via& via);
 
-  private:
+private:
   int createViaSet();
   Layout& layout_;
   SetIdxVec& setIdxVec_;

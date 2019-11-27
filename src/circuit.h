@@ -21,9 +21,8 @@ typedef std::map<std::string, PackageRelPosVec> PackageToPosMap;
 
 typedef std::unordered_set<int> DontCarePinIdxSet;
 
-class Component
-{
-  public:
+class Component {
+public:
   Component();
   Component(const std::string&, const Via&);
   std::string packageName;
@@ -35,17 +34,15 @@ typedef std::map<std::string, Component> ComponentNameToComponentMap;
 
 // Connections
 
-class ConnectionPoint
-{
-  public:
+class ConnectionPoint {
+public:
   ConnectionPoint(const std::string&, int _pinIdx);
   std::string componentName;
   int pinIdx;
 };
 
-class Connection
-{
-  public:
+class Connection {
+public:
   Connection(const ConnectionPoint& _start, const ConnectionPoint& _end);
   ConnectionPoint start;
   ConnectionPoint end;
@@ -58,9 +55,8 @@ typedef std::vector<StartEndVia> ConnectionViaVec;
 typedef std::vector<std::string> StringVec;
 typedef std::vector<Via> PinViaVec;
 
-class Circuit
-{
-  public:
+class Circuit {
+public:
   Circuit();
   bool hasParserError() const;
   ConnectionViaVec genConnectionViaVec() const;

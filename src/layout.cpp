@@ -3,32 +3,21 @@
 #include "layout.h"
 
 Layout::Layout()
-  : gridW(0),
-    gridH(0),
-    cost(0),
-    nCompletedRoutes(0),
-    nFailedRoutes(0),
-    numShortcuts(0),
-    isReadyForRouting(false),
-    isReadyForEval(false),
-    hasError(false)
-{
+    : gridW(0), gridH(0), cost(0), nCompletedRoutes(0), nFailedRoutes(0), numShortcuts(0), isReadyForRouting(false),
+      isReadyForEval(false), hasError(false) {
   updateBaseTimestamp();
 }
 
-Layout::Layout(const Layout& s)
-{
-  copy(s);
-}
+Layout::Layout(const Layout& s) { copy(s); }
 
-Layout& Layout::operator=(const Layout& s)
-{
+Layout&
+Layout::operator=(const Layout& s) {
   copy(s);
   return *this;
 }
 
-void Layout::copy(const Layout& s)
-{
+void
+Layout::copy(const Layout& s) {
   circuit = s.circuit;
   settings = s.settings;
   gridW = s.gridW;
@@ -58,28 +47,28 @@ void Layout::copy(const Layout& s)
   timestamp_ = s.timestamp_;
 }
 
-void Layout::updateBaseTimestamp()
-{
+void
+Layout::updateBaseTimestamp() {
   timestamp_ = std::chrono::high_resolution_clock::now();
 }
 
-bool Layout::isBasedOn(const Layout& other)
-{
+bool
+Layout::isBasedOn(const Layout& other) {
   return timestamp_ == other.timestamp_;
 }
 
-Timestamp& Layout::getBaseTimestamp()
-{
+Timestamp&
+Layout::getBaseTimestamp() {
   return timestamp_;
 }
 
-std::unique_lock<std::mutex> Layout::scopeLock()
-{
+std::unique_lock<std::mutex>
+Layout::scopeLock() {
   return std::unique_lock<std::mutex>(mutex_);
 }
 
-Layout Layout::threadSafeCopy()
-{
+Layout
+Layout::threadSafeCopy() {
   auto lock = scopeLock();
   Layout l = *this;
   return l;
@@ -90,11 +79,11 @@ Layout Layout::threadSafeCopy()
 // where I expect the layout to already be locked. The problem is that the
 // function briefly locks the layout, and so can cause other threads that check
 // simultaneously to get a false "true" from isLocked().
-bool Layout::isLocked()
-{
+bool
+Layout::isLocked() {
   auto lock = std::unique_lock<std::mutex>(mutex_, std::defer_lock);
   auto wasLocked = !lock.try_lock();
-  if (!wasLocked) {
+  if(!wasLocked) {
     lock.release();
   }
   //  fmt::print("{}\n", isLocked);
@@ -103,7 +92,7 @@ bool Layout::isLocked()
   return wasLocked;
 }
 
-int Layout::idx(const Via& v)
-{
+int
+Layout::idx(const Via& v) {
   return v.x() + gridW * v.y();
 }

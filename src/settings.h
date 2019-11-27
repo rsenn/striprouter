@@ -7,9 +7,8 @@ const int DEFAULT_STRIP_COST = 10;
 const int DEFAULT_VIA_COST = 1;
 const int DEFAULT_CUT_COST = 100;
 
-class Settings
-{
-  public:
+class Settings {
+public:
   Settings();
   int wire_cost;
   int strip_cost;

@@ -16,15 +16,12 @@ typedef std::unordered_set<LayerVia> ExploredSet;
 
 class Router;
 
-class UniformCostSearch
-{
-  public:
-  UniformCostSearch(
-      Router& router, Layout& layout, Nets& nets, Via& shortcutEndVia,
-      const StartEndVia& viaStartEnd);
+class UniformCostSearch {
+public:
+  UniformCostSearch(Router& router, Layout& layout, Nets& nets, Via& shortcutEndVia, const StartEndVia& viaStartEnd);
   RouteStepVec findLowestCostRoute();
 
-  private:
+private:
   bool findCosts(Via& shortcutEndVia);
   void exploreNeighbour(LayerCostVia& node, LayerCostVia n);
   void exploreFrontier(LayerCostVia& node, LayerCostVia n);

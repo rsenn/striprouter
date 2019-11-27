@@ -16,19 +16,23 @@
 
 typedef Eigen::Array4f RGBA;
 
-class Render
-{
-  public:
+class Render {
+public:
   Render(); // float zoom
   ~Render();
   void openGLInit();
   void openGLFree();
-  void draw(
-      Layout& layout, glm::mat4x4& projMat, const Pos& boardScreenOffset,
-      const Pos& mouseBoardPos, float zoom, int windowW, int windowH,
-      bool showRatsNestBool, bool showOnlyFailedBool);
+  void draw(Layout& layout,
+            glm::mat4x4& projMat,
+            const Pos& boardScreenOffset,
+            const Pos& mouseBoardPos,
+            float zoom,
+            int windowW,
+            int windowH,
+            bool showRatsNestBool,
+            bool showOnlyFailedBool);
 
-  private:
+private:
   void drawUsedStrips();
   void drawWireSections();
   void drawComponents();
@@ -41,8 +45,7 @@ class Render
   void drawFilledCircle(const Pos& center, float radius, const RGBA&);
   void addFilledCircle(const Pos& center, float radius);
   void drawFilledCircleBuffer(const RGBA& rgba);
-  void drawThickLine(
-      const Pos& start, const Pos& end, float radius, const RGBA&);
+  void drawThickLine(const Pos& start, const Pos& end, float radius, const RGBA&);
   void printNotation(Pos p, int nLine, std::string msg);
   void setColor(const RGBA&);
   bool isPointOutsideScreen(const Pos& p);

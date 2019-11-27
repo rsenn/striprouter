@@ -51,19 +51,19 @@ get_bindir() {
         dir.resize(pos);
         dir += "/bin";
       }
-    } 
-    
-    if(!dir.empty() && !fs_exists(dir+"/fonts")) {
+    }
+
+    if(!dir.empty() && !fs_exists(dir + "/fonts")) {
       size_t pos = dir.find("/bin");
       if(pos != std::string::npos) {
-            dir.resize(pos);
-            dir += "/share/striprouter";
+        dir.resize(pos);
+        dir += "/share/striprouter";
       }
     }
 
-    if(dir.empty() || !fs_exists(dir+"/fonts"))
+    if(dir.empty() || !fs_exists(dir + "/fonts"))
       dir = "bin";
-    
+
     std::cerr << "bindir: " << dir << std::endl;
   }
 

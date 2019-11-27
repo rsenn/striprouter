@@ -3,17 +3,12 @@
 #include "gui_status.h"
 #include "via.h"
 
-GuiStatus::GuiStatus()
-{
-  reset();
-}
+GuiStatus::GuiStatus() { reset(); }
 
-GuiStatus::~GuiStatus()
-{
-}
+GuiStatus::~GuiStatus() {}
 
-void GuiStatus::reset()
-{
+void
+GuiStatus::reset() {
   msPerFrame = 0.0f;
 
   nCombinationsChecked = 0;
@@ -38,8 +33,8 @@ void GuiStatus::reset()
   groupedStrBestCost = "";
 }
 
-void GuiStatus::init(nanogui::Screen* screen)
-{
+void
+GuiStatus::init(nanogui::Screen* screen) {
   screen_ = screen;
 
   form_ = new nanogui::FormHelper(screen_);
@@ -107,13 +102,13 @@ void GuiStatus::init(nanogui::Screen* screen)
   }
 }
 
-void GuiStatus::free()
-{
+void
+GuiStatus::free() {
   delete form_;
 }
 
-void GuiStatus::refresh()
-{
+void
+GuiStatus::refresh() {
   groupedStrCombinationsChecked = groupThousands(nCombinationsChecked);
 
   groupedStrCurrentCompletedRoutes = groupThousands(nCurrentCompletedRoutes);
@@ -127,12 +122,12 @@ void GuiStatus::refresh()
   form_->refresh();
 }
 
-std::string GuiStatus::groupThousands(long n)
-{
+std::string
+GuiStatus::groupThousands(long n) {
   return fmt::format("{:n}", n);
 }
 
-void GuiStatus::moveToUpperLeft()
-{
+void
+GuiStatus::moveToUpperLeft() {
   formWin_->setPosition(IntPos(0, 0));
 }

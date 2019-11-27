@@ -12,8 +12,7 @@
 #include FT_FREETYPE_H
 #include <GL/glew.h>
 
-struct CharMeta
-{
+struct CharMeta {
   int tex_x;
   int tex_y;
   int tex_w;
@@ -23,21 +22,18 @@ struct CharMeta
   int advance;
 };
 
-class OglText
-{
-  public:
+class OglText {
+public:
   OglText(const std::string& fontPath, int fontH);
   ~OglText();
   void openGLInit();
   void openGLFree();
   void setFontH(int fontH);
-  void print(
-      glm::mat4x4& projMat, int x, int y, int nLine, const std::string& str,
-      bool drawBackground = true);
+  void print(glm::mat4x4& projMat, int x, int y, int nLine, const std::string& str, bool drawBackground = true);
   int calcStringWidth(const std::string& str);
   int getLineHeight();
 
-  private:
+private:
   void createFreeType(const std::string& fontPath);
   void createFontTexture();
   bool renderFont(std::vector<unsigned char>& fontVec);

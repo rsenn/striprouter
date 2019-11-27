@@ -31,8 +31,8 @@ endif ()
 
 # fmt
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  #set(FMT_LIBRARIES fmt)
-  set(FMT_LIBRARIES ${LIBRARIES}/fmt-3.0.1/libfmtd.a)
+  set(FMT_LIBRARIES fmt)
+  # set(FMT_LIBRARIES ${CMAKE_BINARY_DIR}/libraries/linux/fmt-3.0.1/libfmtd.a)
   set(FMT_INCLUDE_DIR ${LIBRARIES}/fmt-3.0.1)
   set(FMT_LINK_DIR ${LIBRARIES}/fmt-3.0.1/fmt)
   set(BUILD_SHARED_LIBS OFF)
@@ -221,3 +221,10 @@ configure_file(${SHADER_SRC}/fill.vert ${SHADER_DST} COPYONLY)
 add_executable(striprouter ${SOURCE_FILES})
 
 install(TARGETS striprouter DESTINATION bin)
+
+install(DIRECTORY bin/benchmarks DESTINATION share/striprouter)
+install(DIRECTORY bin/circuits DESTINATION share/striprouter)
+install(DIRECTORY bin/fonts DESTINATION share/striprouter)
+install(DIRECTORY bin/perf DESTINATION share/striprouter)
+install(DIRECTORY bin/shaders DESTINATION share/striprouter)
+

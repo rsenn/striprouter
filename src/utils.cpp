@@ -30,6 +30,13 @@ readlink_str(const std::string& link) {
   return ret;
 }
 
+bool
+fs_exists(const std::string& path) {
+  struct stat st;
+
+  return stat(path.c_str(), &st) != -1;
+}
+
 std::string
 get_bindir() {
   static std::string dir;
@@ -44,9 +51,19 @@ get_bindir() {
         dir.resize(pos);
         dir += "/bin";
       }
-    } else {
-      dir = "bin";
+    } 
+    
+    if(!dir.empty() && !fs_exists(dir+"/fonts")) {
+      size_t pos = dir.find("/bin");
+      if(pos != std::string::npos) {
+            dir.resize(pos);
+            dir += "/share/striprouter";
+      }
     }
+
+    if(dir.empty() || !fs_exists(dir+"/fonts"))
+      dir = "bin";
+    
     std::cerr << "bindir: " << dir << std::endl;
   }
 

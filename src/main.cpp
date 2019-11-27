@@ -792,12 +792,9 @@ resetInputLayout() {
   }
 }
 
-
-
 int
 main(int argc, char** argv) {
 
- 
   Render render;
   //  fmt::print("GLFW: {}\n", glfwGetVersionString());
   std::srand(std::time(0));
@@ -870,7 +867,7 @@ runGui(Render& r) {
   setlocale(LC_NUMERIC, "");
   nanogui::ref<Application> app = new Application(r);
   app->setVisible(true);
-  setWindowIcon(get_bindir()+"/icons/48x48.png");
+  setWindowIcon(get_bindir() + "/icons/48x48.png");
   isParserPaused = false;
 
   nanogui::mainloop();

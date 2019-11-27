@@ -6,7 +6,7 @@
   },
   {
     "name": "Build with CMake",
-    "shell_cmd": ". ./cfg-cmake.sh; builddir=build/cmake cfg -DCMAKE_VERBOSE_MAKEFILE=TRUE -DCMAKE_BUILD_TYPE=Debug && make -C build/cmake "
+    "shell_cmd": "cd ${folder:${project_path:${file}}}; . ./cfg-cmake.sh; builddir=build/cmake cfg -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Debug && make -C build/cmake "
   },
   ],
 	"folders":

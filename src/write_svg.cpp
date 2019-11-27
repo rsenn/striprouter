@@ -1,4 +1,4 @@
-#include "simple_svg.hpp"
+#include "simple_svg_1.0.0.hpp"
 
 #include "fmt/format.h"
 

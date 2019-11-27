@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 project(striprouter)
 
-# https://cmake.org/cmake/help/v3.0/policy/CMP0015.html
+set(CMAKE_CXX11_EXTENSION_COMPILE_OPTION -std=gnu++17)
+list(APPEND CMAKE_C_FLAGS -w)
+list(APPEND CMAKE_CXX_FLAGS -w)
+
 cmake_policy(SET "CMP0015" "NEW")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -30,6 +34,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(FMT_LIBRARIES fmt)
   set(FMT_INCLUDE_DIR ${LIBRARIES}/fmt-3.0.1)
   set(FMT_LINK_DIR ${LIBRARIES}/fmt-3.0.1/fmt)
+  add_subdirectory(${LIBRARIES}/fmt-3.0.1)
 else ()
   set(FMT_LIBRARIES fmt.lib)
   set(FMT_INCLUDE_DIR ${LIBRARIES}/include)
@@ -82,11 +87,11 @@ else ()
 endif ()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
   # Handling of compiler warnings
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -Wno-deprecated-declarations")
   # Add relative ./lib to dynamic linker search path
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--enable-new-dtags,--rpath=${ORIGIN}./lib")
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--enable-new-dtags,--rpath=${ORIGIN}./lib")
 endif ()
 
 # NanoGUI
@@ -151,9 +156,8 @@ set(SOURCE_FILES
   ${SOURCE_DIR}/via.cpp
   ${SOURCE_DIR}/write_svg.cpp
 )
-if(NOT EIGEN3_INCLUDE_DIR)
-  SET(EIGEN3_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/eigen3)
-endif(NOT EIGEN3_INCLUDE_DIR) 
+  LIST(APPEND EIGEN3_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/eigen3)
+  LIST(APPEND EIGEN3_INCLUDE_DIR /usr/include/eigen3)
 
 include_directories(
   ${HEADER_LIBRARIES}

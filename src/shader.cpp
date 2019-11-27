@@ -9,7 +9,8 @@
 #include "shader.h"
 #include "utils.h"
 
-const std::string SHADERS_DIR_PATH = "./shaders/";
+
+const std::string SHADERS_DIR_PATH = get_bindir() + "/shaders/";
 
 void compileAndCheckShader(const char* path, GLuint shaderId);
 void printInfoLog(GLuint shaderId, bool isShader);

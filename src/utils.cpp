@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <iostream>
 
 #include "fmt/format.h"
 #include <GL/glew.h>
@@ -14,6 +15,45 @@
 #include "utils.h"
 
 using namespace std::chrono_literals;
+
+
+std::string
+readlink_str(const std::string& link) {
+  std::string ret;  ret.resize(1024);
+  ssize_t n = readlink(link.c_str(), ret.data(), ret.length());
+  if(n > 0) {
+    if(ret[n - 1] == '\0')
+      --n;
+    ret.resize(n);
+  }
+  else
+    ret.clear();
+  return ret;
+}
+
+std::string 
+get_bindir() {
+  static std::string dir;
+
+ if(dir.empty()) {
+   std::string me = readlink_str("/proc/self/exe");
+  if(me.length()) {
+    size_t  pos;
+    dir = me;
+    dir.resize(dir.find_last_of("/\\"));
+    if((pos = dir.find("/build/")) != std::string::npos ) {
+      dir.resize(pos);
+      dir += "/bin";
+    }
+  } else {
+    dir = "bin";
+  }
+  std::cerr << "bindir: " << dir << std::endl;
+}
+
+  return dir;
+}
+
 
 //
 // OpenGL

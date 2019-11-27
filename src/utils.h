@@ -13,6 +13,8 @@
 
 #include <nanogui/opengl.h>
 
+std::string get_bindir();
+
 // OpenGL
 bool saveScreenshot(std::string filename, int w, int h);
 void showTexture(int windowW, int windowH, GLuint textureId);

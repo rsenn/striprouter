@@ -14,10 +14,11 @@
 #include "gui.h"
 #include "render.h"
 #include "shader.h"
+#include "utils.h"
 
 const float PI_F = static_cast<float>(M_PI);
 const float CIRCUIT_FONT_SIZE = 1.0f;
-const char* CIRCUIT_FONT_PATH = "./fonts/Roboto-Regular.ttf";
+const char* CIRCUIT_FONT_FILE = "/fonts/Roboto-Regular.ttf";
 const int NOTATION_FONT_SIZE = 10;
 const float SET_DIM = 0.3f;
 const int NUM_VIA_TRIANGLES = 16;
@@ -28,8 +29,8 @@ const float RATS_NEST_WIRE_WIDTH = 0.1f;
 const float CONNECTION_WIDTH = 0.1f;
 
 Render::Render()
-  : componentText_(OglText(CIRCUIT_FONT_PATH, CIRCUIT_FONT_SIZE)),
-    notationText_(OglText(CIRCUIT_FONT_PATH, NOTATION_FONT_SIZE)),
+  : componentText_(OglText(get_bindir() +  CIRCUIT_FONT_FILE, CIRCUIT_FONT_SIZE)),
+    notationText_(OglText(get_bindir() +  CIRCUIT_FONT_FILE, NOTATION_FONT_SIZE)),
     fillProgramId_(0),
     vertexBufId_(0)
 {

@@ -1,0 +1,18 @@
+{
+    "build_systems": [
+  {
+    "name": "List",
+    "shell_cmd": "ls -l"
+  },
+  {
+    "name": "Build with CMake",
+    "shell_cmd": ". ./cfg-cmake.sh; builddir=build/cmake cfg -DCMAKE_VERBOSE_MAKEFILE=TRUE -DCMAKE_BUILD_TYPE=Debug && make -C build/cmake "
+  },
+  ],
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	]
+}

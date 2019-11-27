@@ -168,6 +168,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
   ${PNG_INCLUDE_DIRS}
   ${SIMPLE_SVG_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}/libraries/linux/nanogui/ext/nanovg/src
   ${CMAKE_SOURCE_DIR}/libraries/linux/nanovg/src
   ${CMAKE_SOURCE_DIR}/libraries/header_only/simple-svg
   ${CMAKE_SOURCE_DIR}/libraries/header_only/CmdParser

@@ -5,8 +5,12 @@
     "shell_cmd": "ls -l"
   },
   {
-    "name": "Build with CMake",
-    "shell_cmd": "cd ${folder:${project_path:${file}}}; . ./cfg-cmake.sh; builddir=build/cmake cfg -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Debug && make -C build/cmake "
+    "name": "Build with CMake + GNU make",
+    "shell_cmd": "cd ${folder:${project_path:${file}}}; . ./cfg-cmake.sh; builddir=build/cmake-gnu  cfg -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Debug && make -C build/cmake-gnu -j 10"
+  },
+  {
+    "name": "Build with CMake + Ninja",
+    "shell_cmd": "cd ${folder:${project_path:${file}}}; . ./cfg-cmake.sh; builddir=build/cmake-ninja generator=Ninja cfg -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Debug && ninja -C build/cmake-ninja -j 10"
   },
   ],
 	"folders":

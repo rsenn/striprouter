@@ -38,7 +38,9 @@
 #include "via.h"
 #include "write_svg.h"
 
-using namespace std::chrono_literals;
+#include <chrono>
+
+using namespace std::literals::chrono_literals;
 
 // Zoom / pan
 const float ZOOM_MOUSE_WHEEL_STEP = 0.3f;

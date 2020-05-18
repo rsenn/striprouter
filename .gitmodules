@@ -12,3 +12,6 @@
 	path = libraries/linux/fmt-3.0.1
 	url = https://github.com/rsenn/fmt.git
 	branch = v3.0.1
+[submodule "libraries/header_only/CmdParser"]
+	path = libraries/header_only/CmdParser
+	url = https://github.com/FlorianRappl/CmdParser

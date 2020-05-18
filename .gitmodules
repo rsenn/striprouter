@@ -1,9 +1,6 @@
 [submodule "libraries/header_only/simple-svg"]
 	path = libraries/header_only/simple-svg
 	url = https://github.com/adishavit/simple-svg
-[submodule "libraries/header_only/CmdParser"]
-	path = libraries/header_only/CmdParser
-	url = https://github.com/FlorianRappl/CmdParser
 [submodule "libraries/linux/nanogui"]
 	path = libraries/linux/nanogui
 	url = https://github.com/wjakob/nanogui

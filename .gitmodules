@@ -12,3 +12,6 @@
 [submodule "fmt-3.0.0"]
 	path = libraries/linux/fmt-3.0.0
 	url = https://github.com/fmtlib/fmt
+[submodule "libraries/header_only/simple-svg"]
+	path = libraries/header_only/simple-svg
+	url = https://github.com/rsenn/simple-svg

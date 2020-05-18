@@ -15,6 +15,3 @@
 	path = libraries/linux/fmt-3.0.1
 	url = https://github.com/fmtlib/fmt.git
 	branch = 3.0.1
-[submodule "fmt-3.0.0"]
-	path = libraries/linux/fmt-3.0.0
-	url = https://github.com/fmtlib/fmt

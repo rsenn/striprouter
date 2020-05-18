@@ -20,7 +20,7 @@ std::string
 readlink_str(const std::string& link) {
   std::string ret;
   ret.resize(1024);
-  ssize_t n = readlink(link.c_str(), ret.data(), ret.length());
+  ssize_t n = readlink(link.c_str(), const_cast<char*>(ret.data()), ret.length());
   if(n > 0) {
     if(ret[n - 1] == '\0')
       --n;

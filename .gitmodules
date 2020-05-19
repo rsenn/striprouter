@@ -16,10 +16,6 @@
         url = https://github.com/rsenn/fmt.git
         branch = v3.0.1
 
-[submodule "libraries/header_only/png++"]
-	path = libraries/header_only/png++
-	url = https://github.com/yuwui/pngpp.git
-
 [submodule "libraries/header_only/glm"]
         path = libraries/header_only/glm
         url = https://github.com/rsenn/glm.git
@@ -27,3 +23,6 @@
 [submodule "libraries/header_only/CmdParser"]
 	path = libraries/header_only/CmdParser
 	url = https://github.com/rsenn/CmdParser.git
+[submodule "libraries/header_only/png++"]
+	path = libraries/header_only/png++
+	url = https://github.com/rsenn/pngpp.git

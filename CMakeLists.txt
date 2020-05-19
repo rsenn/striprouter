@@ -179,6 +179,8 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/libraries/linux/nanovg/src
   ${CMAKE_SOURCE_DIR}/libraries/header_only/simple-svg
   ${CMAKE_SOURCE_DIR}/libraries/header_only/CmdParser
+  ${CMAKE_SOURCE_DIR}/libraries/header_only/glm
+  ${CMAKE_SOURCE_DIR}/libraries/header_only/glm/glm
 )
 
 link_directories(

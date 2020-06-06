@@ -112,6 +112,9 @@ else ()
   #set(NANO_LINK_DIR ${LIBRARIES}/nanogui/build/Debug)
 endif ()
 
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/libraries/linux/nanogui)
+
 # Eigen
 #find_package(Eigen3 REQUIRED)
 

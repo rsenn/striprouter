@@ -16,7 +16,7 @@ cfg() {
       i686-pc-*) host="$host" builddir=build/${host} prefix=/usr ;;
     esac
   fi
-  : ${prefix:=/usr}
+  : ${prefix:=/usr/local}
   : ${libdir:=$prefix/lib}
   [ -d "$libdir/$host" ] && libdir=$libdir/$host
 
@@ -49,7 +49,7 @@ cfg() {
   cd "${builddir:-.}"
   ${CMAKE:-cmake} -Wno-dev \
     -G "$generator" \
-    ${VERBOSE+:-DCMAKE_VERBOSE_MAKEFILE=TRUE} \
+    ${VERBOSE:+-DCMAKE_VERBOSE_MAKEFILE=TRUE} \
     -DCMAKE_BUILD_TYPE="${TYPE:-Debug}" \
     -DBUILD_SHARED_LIBS=ON \
     ${CC:+-DCMAKE_C_COMPILER="$CC"} \
@@ -58,8 +58,6 @@ cfg() {
     ${TOOLCHAIN:+-DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"} \
     ${CC:+-DCMAKE_C_COMPILER="$CC"} \
     ${CXX:+-DCMAKE_CXX_COMPILER="$CXX"} \
-    -DCMAKE_{C,CXX}_FLAGS_DEBUG="-g -ggdb3" \
-    -DCMAKE_{C,CXX}_FLAGS_RELWITHDEBINFO="-Os -g -ggdb3 -DNDEBUG" \
     ${MAKE:+-DCMAKE_MAKE_PROGRAM="$MAKE"} \
     "$@" \
     $relsrcdir 2>&1 ) |tee "${builddir##*/}.log"
@@ -96,7 +94,7 @@ cfg-diet() {
     export PKG_CONFIG=pkgconf
   fi
 
-  export PKG_CONFIG_PATH="$libdir/pkgconfig"
+  : ${PKG_CONFIG_PATH="$libdir/pkgconfig"}; export PKG_CONFIG_PATH
   
   builddir=build/${host%-*}-diet \
   cfg \
